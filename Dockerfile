@@ -27,14 +27,10 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
-# Copy project files
+COPY package*.json ./
+RUN npm install
 COPY . .
 
-# Install dependencies
-RUN npm install
-
-# Expose the port Cloud Run will listen on
+# Expose port and run
 EXPOSE 8080
-
-# Start your server
-CMD ["node", "index.js"]
+CMD [ "npm", "start" ]
