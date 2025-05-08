@@ -32,10 +32,11 @@ COPY package*.json ./
 
 # Skip Chromium download during npm install
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-RUN npm install
 
 # Copy the application code, including build.sh and fetchAndStoreSecrets.js
 COPY . .
+
+RUN npm install
 
 # Ensure the start script is executable
 RUN chmod +x build.sh
