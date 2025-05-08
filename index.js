@@ -8,14 +8,19 @@ const app = express();
 app.use(express.json());
 
 // AWS S3 config
-const bucketName = process.env.AWS_BUCKET_NAME;
-const region = process.env.AWS_REGION; // e.g., "ap-south-1"
+// const bucketName = process.env.AWS_BUCKET_NAME;
+// const region = process.env.AWS_REGION; // e.g., "ap-south-1"
+const bucketName = "utsav-dev-s3-bucket"; // Replace with your bucket name
+const region = "ap-south-1"; // Replace with your bucket region
+const AWS_ACCESS_KEY_ID = "AKIAYS2NUCVX6BMC3TGI"; // Replace with your access key
+const AWS_SECRET_ACCESS_KEY = "5/ZFW7xWFRVwalQyfRRJ16WUcMUTWggxU1WXTfgl"; // Replace with your secret key
+const PUBLIC_STORAGE_BASE_URL = "https://utsav-dev-v2-media.gumlet.io/";
 
 const s3 = new S3Client({
   region,
   credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID, // Recommended: use .env file
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    accessKeyId: AWS_ACCESS_KEY_ID, // Recommended: use .env file
+    secretAccessKey: AWS_SECRET_ACCESS_KEY,
   },
 });
 
@@ -48,7 +53,7 @@ app.post("/generate-pdf", async (req, res) => {
 
     await s3.send(command);
 
-    const publicUrl = `${process.env.PUBLIC_STORAGE_BASE_URL}${fileName}`;
+    const publicUrl = `${PUBLIC_STORAGE_BASE_URL}${fileName}`;
     res.json({ success: true, url: publicUrl });
   } catch (err) {
     console.error("Error:", err);
