@@ -9,24 +9,6 @@ const s3 = createS3Client();
 const app = express();
 app.use(express.json());
 
-// AWS S3 config (read from environment variables)
-// const region = process.env.AWS_REGION;
-// const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
-// const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
-
-// Validate that the variables are set
-// if (!bucketName || !region || !AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY || !PUBLIC_STORAGE_BASE_URL) {
-//   throw new Error("Missing required environment variables");
-// }
-
-// const s3 = new S3Client({
-//   region,
-//   credentials: {
-//     accessKeyId: AWS_ACCESS_KEY_ID,
-//     secretAccessKey: AWS_SECRET_ACCESS_KEY,
-//   },
-// });
-
 app.post("/generate-pdf", async (req, res) => {
   try {
     const { html } = req.body;
