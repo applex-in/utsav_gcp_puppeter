@@ -36,7 +36,15 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 # Copy the application code, including build.sh and fetchAndStoreSecrets.js
 COPY . .
 
-RUN npm install
+# Before install
+RUN echo "📦 Starting npm install..."
+
+# Run install with verbose logging
+RUN npm install --verbose
+
+# After install
+RUN echo "✅ Finished npm install"
+# RUN npm install
 
 # Ensure the start script is executable
 RUN chmod +x build.sh
