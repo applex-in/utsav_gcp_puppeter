@@ -1,9 +1,10 @@
 require("dotenv").config();
 const express = require("express");
-const puppeteer = require("puppeteer");
+const puppeteer = require("puppeteer-core");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { v4: uuidv4 } = require("uuid");
-const s3 = require("./configurations/bucketConfig");
+const createS3Client = require("./configurations/bucketConfig");
+const s3 = createS3Client();
 
 const app = express();
 app.use(express.json());
@@ -34,6 +35,8 @@ app.post("/generate-pdf", async (req, res) => {
     const browser = await puppeteer.launch({
       headless: true,
       args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      executablePath:
+        process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
     });
 
     const page = await browser.newPage();

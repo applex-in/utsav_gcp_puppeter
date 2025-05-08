@@ -1,7 +1,7 @@
-# Use Node.js base image
+# Use official Node.js slim base image
 FROM node:18-slim
 
-# Install Puppeteer's required dependencies
+# Install necessary dependencies including Chromium for puppeteer-core
 RUN apt-get update && apt-get install -y \
   wget \
   ca-certificates \
@@ -21,51 +21,42 @@ RUN apt-get update && apt-get install -y \
   libxrandr2 \
   xdg-utils \
   libgbm1 \
+  chromium \
   --no-install-recommends && \
   apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Skip Chromium download during npm install
+# Set environment variable to avoid downloading Chromium again
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-# Copy the application code, including build.sh and fetchAndStoreSecrets.js
-COPY . .
-
-# Before install
-RUN echo "📦 Starting npm install..."
-
-# Run install with verbose logging
-RUN npm install --verbose
-
-# After install
-RUN echo "✅ Finished npm install"
-# RUN npm install
-
-# Ensure the start script is executable
-RUN chmod +x build.sh
-
-# Ensure the /app directory is writable by the node user
-RUN chown -R node:node /app
-
-# Switch to the node user for security
-USER node
-
-# Expose the port the app runs on
-EXPOSE 8080
-
-# Set environment variable to tell Puppeteer to use the installed Chromium
+# Set Puppeteer to use installed Chromium
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# Note: Set ENVIRONMENT via Cloud Run configuration, e.g., ENVIRONMENT=UAT
-# Ensure the Cloud Run service account has Secret Manager Secret Accessor role
+# Copy package.json and lock file first (Docker cache optimization)
+COPY package*.json ./
 
-# Use the start script as the command to run
-CMD ["./build.sh"]
+# Install dependencies
+RUN echo "📦 Installing NPM dependencies..." && \
+    npm install --verbose && \
+    echo "✅ NPM install complete"
+
+# Copy app source code
+COPY . .
+
+# Make start script executable (if needed)
+RUN chmod +x build.sh || true
+
+# Ensure directory permissions and security best practice
+RUN chown -R node:node /app
+USER node
+
+# Expose the port your app listens on
+EXPOSE 8080
+
+# Run the server
+CMD ["npm", "start"]
 
 # # Use Node.js base image
 # FROM node:18-slim
