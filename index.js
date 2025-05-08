@@ -1,30 +1,30 @@
+require("dotenv").config();
 const express = require("express");
 const puppeteer = require("puppeteer");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { v4: uuidv4 } = require("uuid");
+const s3 = require("./configurations/bucketConfig");
 
 const app = express();
 app.use(express.json());
 
 // AWS S3 config (read from environment variables)
-const bucketName = process.env.AWS_BUCKET_NAME;
-const region = process.env.AWS_REGION;
-const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
-const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
-const PUBLIC_STORAGE_BASE_URL = process.env.PUBLIC_STORAGE_BASE_URL;
+// const region = process.env.AWS_REGION;
+// const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
+// const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
 
 // Validate that the variables are set
-if (!bucketName || !region || !AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY || !PUBLIC_STORAGE_BASE_URL) {
-  throw new Error("Missing required environment variables");
-}
+// if (!bucketName || !region || !AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY || !PUBLIC_STORAGE_BASE_URL) {
+//   throw new Error("Missing required environment variables");
+// }
 
-const s3 = new S3Client({
-  region,
-  credentials: {
-    accessKeyId: AWS_ACCESS_KEY_ID,
-    secretAccessKey: AWS_SECRET_ACCESS_KEY,
-  },
-});
+// const s3 = new S3Client({
+//   region,
+//   credentials: {
+//     accessKeyId: AWS_ACCESS_KEY_ID,
+//     secretAccessKey: AWS_SECRET_ACCESS_KEY,
+//   },
+// });
 
 app.post("/generate-pdf", async (req, res) => {
   try {
@@ -43,6 +43,9 @@ app.post("/generate-pdf", async (req, res) => {
 
     // Generate a unique filename
     const fileName = `pdfs/output-${uuidv4()}.pdf`;
+
+    const bucketName = process.env.AWS_BUCKET_NAME;
+    const PUBLIC_STORAGE_BASE_URL = process.env.PUBLIC_STORAGE_BASE_URL;
 
     // Upload to S3 using PutObjectCommand
     const command = new PutObjectCommand({
