@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 const puppeteer = require("puppeteer");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
@@ -7,19 +6,22 @@ const { v4: uuidv4 } = require("uuid");
 const app = express();
 app.use(express.json());
 
-// AWS S3 config
-// const bucketName = process.env.AWS_BUCKET_NAME;
-// const region = process.env.AWS_REGION; // e.g., "ap-south-1"
-const bucketName = "utsav-dev-s3-bucket"; // Replace with your bucket name
-const region = "ap-south-1"; // Replace with your bucket region
-const AWS_ACCESS_KEY_ID = "AKIAYS2NUCVX6BMC3TGI"; // Replace with your access key
-const AWS_SECRET_ACCESS_KEY = "5/ZFW7xWFRVwalQyfRRJ16WUcMUTWggxU1WXTfgl"; // Replace with your secret key
-const PUBLIC_STORAGE_BASE_URL = "https://utsav-dev-v2-media.gumlet.io/";
+// AWS S3 config (read from environment variables)
+const bucketName = process.env.AWS_BUCKET_NAME;
+const region = process.env.AWS_REGION;
+const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID;
+const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY;
+const PUBLIC_STORAGE_BASE_URL = process.env.PUBLIC_STORAGE_BASE_URL;
+
+// Validate that the variables are set
+if (!bucketName || !region || !AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY || !PUBLIC_STORAGE_BASE_URL) {
+  throw new Error("Missing required environment variables");
+}
 
 const s3 = new S3Client({
   region,
   credentials: {
-    accessKeyId: AWS_ACCESS_KEY_ID, // Recommended: use .env file
+    accessKeyId: AWS_ACCESS_KEY_ID,
     secretAccessKey: AWS_SECRET_ACCESS_KEY,
   },
 });
@@ -48,7 +50,6 @@ app.post("/generate-pdf", async (req, res) => {
       Key: fileName,
       Body: pdfBuffer,
       ContentType: "application/pdf",
-      //   ACL: "public-read", // 👈 Public access to file
     });
 
     await s3.send(command);

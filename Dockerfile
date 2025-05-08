@@ -28,9 +28,15 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 COPY package*.json ./
+# Skip Chromium download during npm install
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 RUN npm install
 COPY . .
 
 # Expose port and run
 EXPOSE 8080
+
+# Set environment variable to tell Puppeteer to use the installed Chromium
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+
 CMD [ "npm", "start" ]
