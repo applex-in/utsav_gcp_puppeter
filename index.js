@@ -7,6 +7,7 @@ const createS3Client = require("./configurations/bucketConfig");
 const s3 = createS3Client();
 
 const app = express();
+
 app.use(express.json());
 
 app.post("/generate-pdf", async (req, res) => {
