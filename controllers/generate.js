@@ -60,10 +60,15 @@ module.exports = {
           process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
       });
 
+      //   const page = await browser.newPage();
+      //   await page.setContent(html);
+      //   const imageBuffer = await page.screenshot({ fullPage: true });
       const page = await browser.newPage();
-      await page.setContent(html);
-      const imageBuffer = await page.screenshot({ fullPage: true });
+      await page.setViewport({ width: 430, height: 581 }); // <-- match your body size
+      await page.setContent(html, { waitUntil: "networkidle0" });
+      const imageBuffer = await page.screenshot({ fullPage: false }); // fullPage false = crop to viewport
       await browser.close();
+
       // Generate a unique filename
       const fileName = `receipt_images/output-${uuidv4()}.png`;
       const bucketName = process.env.AWS_BUCKET_NAME;
