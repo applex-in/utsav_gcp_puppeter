@@ -70,7 +70,7 @@ module.exports = {
       await browser.close();
 
       // Generate a unique filename
-      const fileName = `receipt_images/output-${uuidv4()}.png`;
+      const fileName = `receipt_images/output-${uuidv4()}.jpg`;
       const bucketName = process.env.AWS_BUCKET_NAME;
       const PUBLIC_STORAGE_BASE_URL = process.env.PUBLIC_STORAGE_BASE_URL;
       // Upload to S3 using PutObjectCommand
@@ -78,7 +78,7 @@ module.exports = {
         Bucket: bucketName,
         Key: fileName,
         Body: imageBuffer,
-        ContentType: "image/png",
+        ContentType: "image/jpeg",
       });
 
       await s3.send(command);
