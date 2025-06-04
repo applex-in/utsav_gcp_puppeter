@@ -37,6 +37,7 @@ module.exports = {
         Key: fileName,
         Body: pdfBuffer,
         ContentType: "application/pdf",
+        ACL: "public-read", // Make the file publicly readable
       });
 
       await s3.send(command);
@@ -79,6 +80,7 @@ module.exports = {
         Key: fileName,
         Body: imageBuffer,
         ContentType: "image/jpeg",
+        ACL: "public-read", // Make the image publicly readable
       });
 
       await s3.send(command);
