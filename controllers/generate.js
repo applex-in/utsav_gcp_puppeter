@@ -2,6 +2,7 @@ const puppeteer = require("puppeteer-core");
 const { S3Client, PutObjectCommand } = require("@aws-sdk/client-s3");
 const { v4: uuidv4 } = require("uuid");
 const createS3Client = require("../configurations/bucketConfig");
+const nodeHtmlToImage = require("node-html-to-image");
 const s3 = createS3Client();
 
 module.exports = {
@@ -54,23 +55,30 @@ module.exports = {
       const { html } = req.body;
       // Generate image using Puppeteer
 
-      const browser = await puppeteer.launch({
-        headless: true,
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        executablePath:
-          process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
+      // const browser = await puppeteer.launch({
+      //   headless: true,
+      //   args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      //   executablePath:
+      //     process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium",
+      // });
+
+      // //   const page = await browser.newPage();
+      // //   await page.setContent(html);
+      // //   const imageBuffer = await page.screenshot({ fullPage: true });
+      // const page = await browser.newPage();
+      // // await page.setViewport({ width: 430, height: 581 }); // <-- match your body size
+      // await page.setViewport({ width: 360, height: 475 }); // <-- match your body size
+
+      // await page.setContent(html, { waitUntil: "networkidle0" });
+      // const imageBuffer = await page.screenshot({ fullPage: false }); // fullPage false = crop to viewport
+      // await browser.close();
+
+      const imageBuffer = await nodeHtmlToImage({
+        html: html,
+        puppeteerArgs: {
+          args: ["--no-sandbox", "--headless", "--disable-gpu"],
+        },
       });
-
-      //   const page = await browser.newPage();
-      //   await page.setContent(html);
-      //   const imageBuffer = await page.screenshot({ fullPage: true });
-      const page = await browser.newPage();
-      // await page.setViewport({ width: 430, height: 581 }); // <-- match your body size
-      await page.setViewport({ width: 360, height: 475 }); // <-- match your body size
-
-      await page.setContent(html, { waitUntil: "networkidle0" });
-      const imageBuffer = await page.screenshot({ fullPage: false }); // fullPage false = crop to viewport
-      await browser.close();
 
       // Generate a unique filename
       const fileName = `receipt_images/output-${uuidv4()}.jpg`;
