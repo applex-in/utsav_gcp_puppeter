@@ -9,6 +9,7 @@ module.exports = {
   async test(req, res) {
     res.json({ message: "Test endpoint is working!" });
   },
+  
   async generatePdf(req, res) {
     try {
       const { html } = req.body;
